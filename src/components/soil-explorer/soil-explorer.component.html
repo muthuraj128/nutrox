@@ -1,0 +1,34 @@
+<div class="space-y-8">
+  <div class="text-center">
+    <h2 class="text-3xl font-bold text-[#6A5A4F]">Soil Explorer</h2>
+    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Select a soil type to explore its unique characteristics, nutrient profile, and the crops that thrive in it. The chart visually represents the soil's nutrient balance.</p>
+  </div>
+  
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    @for(soilName of soilNames; track soilName) {
+      <button 
+        (click)="selectSoil(soilName)"
+        [class]="'p-4 text-center rounded-lg border-2 transition-all duration-300 ' + (selectedSoilName() === soilName ? 'transform -translate-y-1 shadow-lg border-[#A47E3B] bg-white' : 'border-[#DCD0C0] bg-white hover:border-[#A47E3B] hover:shadow-md')">
+        {{ soilName }}
+      </button>
+    }
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-lg p-6 grid md:grid-cols-2 gap-6 items-center min-h-[400px]">
+    <div>
+      <h3 class="text-2xl font-bold text-[#A47E3B] mb-3">{{ selectedSoilName() }}</h3>
+      <p class="mb-4 text-gray-700">{{ soilsData[selectedSoilName()].characteristics }}</p>
+      <div class="mb-4">
+        <h4 class="font-semibold text-lg mb-2">Nutrient Profile:</h4>
+        <p class="text-gray-600" [innerHTML]="soilsData[selectedSoilName()].profileText"></p>
+      </div>
+      <div>
+        <h4 class="font-semibold text-lg mb-2">Suitable Crops:</h4>
+        <p class="text-gray-600">{{ soilsData[selectedSoilName()].crops }}</p>
+      </div>
+    </div>
+    <div class="relative h-64 md:h-80">
+      <canvas #soilNutrientChart></canvas>
+    </div>
+  </div>
+</div>

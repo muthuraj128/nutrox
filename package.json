@@ -1,0 +1,33 @@
+{
+  "name": "soil-&-crop-nutrition-guide",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "ng": "ng",
+    "dev": "ng serve",
+    "build": "ng build",
+    "build:prod": "ng build --configuration=production --base-href=/Nutrox-main/",
+    "preview": "ng serve --configuration=production",
+    "start": "ng serve",
+    "deploy:gh": "npm run build:prod && npx angular-cli-ghpages --dir=dist/soil-&-crop-nutrition-guide/browser"
+  },
+  "dependencies": {
+    "@angular/build": "^21.0.0",
+    "@angular/cli": "^21.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/compiler-cli": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.5",
+    "@angular/platform-browser": "^21.0.0",
+    "@google/genai": "^1.38.0",
+    "rxjs": "^7.8.2",
+    "tailwindcss": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "~5.9.3",
+    "vite": "^6.2.0"
+  }
+}

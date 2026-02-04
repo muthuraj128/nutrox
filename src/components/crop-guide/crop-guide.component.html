@@ -1,0 +1,41 @@
+<div class="space-y-8">
+  <div class="text-center">
+    <h2 class="text-3xl font-bold text-[#6A5A4F]">Crop Nutrition Guide</h2>
+    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Choose a crop to understand its specific nutritional needs. This section details the essential macro and micronutrients required for healthy growth and optimal yield.</p>
+  </div>
+
+  <div class="flex justify-center">
+    <select 
+      (change)="selectCrop($event)"
+      class="p-3 border-2 border-[#DCD0C0] rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-[#A47E3B] focus:border-[#A47E3B] w-full max-w-sm">
+      @for(cropName of cropNames; track cropName) {
+        <option [value]="cropName" [selected]="cropName === selectedCropName()">{{ cropName }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <div class="grid md:grid-cols-2 gap-6 items-center min-h-[400px]">
+      <div>
+        <h3 class="text-2xl font-bold text-[#A47E3B] mb-3">{{ selectedCropName() }}</h3>
+        <div class="mb-4">
+            <h4 class="font-semibold text-lg mb-2">Macronutrient Requirements:</h4>
+            <p class="text-gray-600" [innerHTML]="cropsData[selectedCropName()].macro"></p>
+        </div>
+        <div>
+            <h4 class="font-semibold text-lg mb-2">Micronutrient Requirements:</h4>
+            <p class="text-gray-600" [innerHTML]="cropsData[selectedCropName()].micro"></p>
+        </div>
+      </div>
+      <div class="relative h-64 md:h-80">
+        <canvas #cropNutrientChart></canvas>
+      </div>
+    </div>
+    <div class="mt-6 pt-6 border-t border-gray-200 text-center">
+      <button (click)="onGenerateFertilizer()" class="bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-700 transition-colors duration-300 flex items-center justify-center mx-auto gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V5.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15 7l-2 1v8l2-1V7z" /><path d="M4 5a2 2 0 100 4h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L9.586 5H4z" /></svg>
+        Generate Fertilizer Recipe
+      </button>
+    </div>
+  </div>
+</div>

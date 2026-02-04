@@ -1,0 +1,8 @@
+{
+  "name": "Soil & Crop Nutrition Guide",
+  "description": "An interactive dashboard for South Indian agriculture, featuring simulated sensor readings for NPK and fertilizer tank monitoring, a fertilizer ratio generator, and guides for soil and crop types.",
+  "requestFramePermissions": [
+    "serial",
+    "camera"
+  ]
+}

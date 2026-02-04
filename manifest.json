@@ -1,0 +1,22 @@
+{
+  "name": "Soil & Crop Nutrition Guide",
+  "short_name": "AgriGuide",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#FDFBF5",
+  "theme_color": "#A47E3B",
+  "description": "An interactive dashboard for South Indian agriculture, featuring soil analysis and crop guides.",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://picsum.photos/seed/agri1/192/192",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://picsum.photos/seed/agri1/512/512",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

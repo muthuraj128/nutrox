@@ -1,0 +1,88 @@
+<div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+  <div class="text-center mb-8">
+    <h2 class="text-3xl font-bold text-[#6A5A4F]">Motor Control</h2>
+    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Remotely activate or deactivate the fertilizer pump motor. You must be connected to the Arduino to send commands.</p>
+  </div>
+
+  <div class="flex flex-col items-center justify-center space-y-6">
+    <!-- Toggle Switch -->
+    <button 
+      (click)="toggleMotor()"
+      [disabled]="connectionStatus() !== 'connected'"
+      [class]="'relative inline-flex items-center h-20 w-40 rounded-full transition-colors duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A47E3B] ' + (motorOn() ? 'bg-green-500' : 'bg-gray-300') + (connectionStatus() !== 'connected' ? ' cursor-not-allowed opacity-50' : ' cursor-pointer')">
+      <span
+        [class]="'inline-block h-16 w-16 transform bg-white rounded-full transition-transform duration-300 ease-in-out ' + (motorOn() ? 'translate-x-22' : 'translate-x-2')">
+      </span>
+      <span class="absolute left-6 text-white font-bold text-lg" [class.opacity-100]="motorOn()" [class.opacity-0]="!motorOn()">ON</span>
+      <span class="absolute right-4 text-gray-500 font-bold text-lg" [class.opacity-100]="!motorOn()" [class.opacity-0]="motorOn()">OFF</span>
+    </button>
+    
+    <!-- Connection Controls -->
+    <div class="text-center">
+      @if (connectionStatus() === 'disconnected' || connectionStatus() === 'error') {
+        <button 
+          (click)="connect()"
+          class="bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-700 transition-colors duration-300 flex items-center justify-center mx-auto">
+          Connect to Arduino
+        </button>
+      } @else if (connectionStatus() === 'connected') {
+        <button 
+          (click)="disconnect()"
+          class="bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-red-700 transition-colors duration-300 flex items-center justify-center mx-auto">
+          Disconnect
+        </button>
+      } @else if (connectionStatus() === 'connecting') {
+        <button 
+          disabled
+          class="bg-gray-400 text-white font-bold py-3 px-8 rounded-full shadow-lg cursor-not-allowed flex items-center justify-center mx-auto">
+           <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Connecting...</span>
+        </button>
+      }
+
+      @if (connectionStatus() === 'error') {
+        <div class="mt-4 p-3 bg-red-100 border-l-4 border-red-500 text-red-800 rounded-md max-w-lg mx-auto text-left" role="alert">
+          <p class="font-bold">Connection Failed</p>
+          <p class="text-sm">{{ statusMessage() }}</p>
+        </div>
+      } @else {
+        <p class="mt-4 text-gray-500 min-h-[40px] px-4">{{ statusMessage() }}</p>
+      }
+    </div>
+  </div>
+
+  <!-- History Section -->
+  <div class="mt-8 pt-6 border-t border-gray-200">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-[#6A5A4F]">Activation History</h3>
+      @if (motorHistory().length > 0) {
+        <button (click)="clearHistory()" class="text-sm font-semibold text-red-600 hover:text-red-800 transition-colors">
+          Clear History
+        </button>
+      }
+    </div>
+
+    @if (motorHistory().length > 0) {
+      <div class="max-h-60 overflow-y-auto bg-gray-50 rounded-lg p-3 space-y-2 border border-gray-200">
+        @for (entry of motorHistory(); track $index) {
+          <div class="flex justify-between items-center text-sm p-2 rounded-md" [class]="entry.state === 'ON' ? 'bg-green-50' : 'bg-gray-100'">
+            <span class="font-semibold" [class]="entry.state === 'ON' ? 'text-green-700' : 'text-gray-600'">
+              Motor {{ entry.state === 'ON' ? 'Activated' : 'Deactivated' }}
+            </span>
+            <span class="text-gray-500 font-mono text-xs">
+              {{ entry.timestamp | date:'medium' }}
+            </span>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-center text-gray-500 bg-gray-50 rounded-lg p-6 border border-gray-200">
+        <p>No motor activity recorded yet.</p>
+        <p class="text-sm">Connect to the device and toggle the motor to begin logging.</p>
+      </div>
+    }
+  </div>
+</div>

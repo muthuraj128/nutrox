@@ -1,0 +1,63 @@
+<div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+  <div class="text-center mb-8">
+    <h2 class="text-3xl font-bold text-[#6A5A4F]">NPK Soil Sensor</h2>
+    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Connect to the ESP32 soil sensor to get real-time Nitrogen (N), Phosphorus (P), and Potassium (K) readings from your soil.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-8">
+    <!-- Nitrogen -->
+    <div class="bg-[#F1EADF] p-6 rounded-xl shadow-sm">
+      <h3 class="text-xl font-bold text-[#A47E3B]">Nitrogen (N)</h3>
+      <p class="text-5xl font-bold text-[#6A5A4F] my-3">
+        @if (isLoading()) {
+          <span class="animate-pulse">...</span>
+        } @else {
+          {{ readings()?.n?.toFixed(0) ?? '--' }}
+        }
+      </p>
+      <p class="text-sm text-gray-500">mg/kg</p>
+    </div>
+    <!-- Phosphorus -->
+    <div class="bg-[#F1EADF] p-6 rounded-xl shadow-sm">
+      <h3 class="text-xl font-bold text-[#A47E3B]">Phosphorus (P)</h3>
+      <p class="text-5xl font-bold text-[#6A5A4F] my-3">
+        @if (isLoading()) {
+          <span class="animate-pulse">...</span>
+        } @else {
+          {{ readings()?.p?.toFixed(0) ?? '--' }}
+        }
+      </p>
+      <p class="text-sm text-gray-500">mg/kg</p>
+    </div>
+    <!-- Potassium -->
+    <div class="bg-[#F1EADF] p-6 rounded-xl shadow-sm">
+      <h3 class="text-xl font-bold text-[#A47E3B]">Potassium (K)</h3>
+      <p class="text-5xl font-bold text-[#6A5A4F] my-3">
+        @if (isLoading()) {
+          <span class="animate-pulse">...</span>
+        } @else {
+          {{ readings()?.k?.toFixed(0) ?? '--' }}
+        }
+      </p>
+      <p class="text-sm text-gray-500">mg/kg</p>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <button 
+      (click)="getReadings()"
+      [disabled]="isLoading()"
+      class="bg-[#A47E3B] text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-[#8e6b34] transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center mx-auto">
+      @if (isLoading()) {
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Reading...</span>
+      } @else {
+        <span>Read Sensor</span>
+      }
+    </button>
+    <p class="mt-4 text-gray-500 min-h-[20px]">{{ statusMessage() }}</p>
+  </div>
+</div>

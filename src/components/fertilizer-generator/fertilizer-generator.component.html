@@ -1,0 +1,127 @@
+<div class="space-y-8">
+  <div class="text-center">
+    <h2 class="text-3xl font-bold text-[#6A5A4F]">Fertilizer Ratio Generator</h2>
+    <p class="mt-2 text-gray-600 max-w-3xl mx-auto">Generate a custom organic fertilizer recipe based on your soil's needs. Start by reading the NPK values from your soil sensor.</p>
+  </div>
+
+  <!-- Step 1: Get Readings -->
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <h3 class="text-xl font-bold text-[#A47E3B] mb-4 flex items-center">
+      <span class="bg-[#A47E3B] text-white rounded-full h-8 w-8 flex items-center justify-center mr-3 font-bold">1</span>
+      Soil Analysis
+    </h3>
+    @if (source()) {
+      <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-4 rounded-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          @if (source() === 'analyser') {
+            <p class="font-bold">Using data from Plant Analyser</p>
+            <p>The diagnosis below is based on the image you analyzed.</p>
+          } @else if (source() === 'crop') {
+            <p class="font-bold">Using data from Crop Guide</p>
+            <p>The recipe below is based on the selected crop's general nutrient requirements.</p>
+          }
+        </div>
+        <button (click)="switchToSensorMode()" class="bg-white text-blue-700 font-semibold py-2 px-4 border border-blue-500 rounded-full hover:bg-blue-100 transition-colors duration-200 flex-shrink-0">
+          Switch to Soil Sensor
+        </button>
+      </div>
+    } @else {
+      <div class="md:flex md:items-center md:justify-between">
+        <div class="text-gray-700 mb-4 md:mb-0">
+          @if (!readings()) {
+            <p>{{ statusMessage() }}</p>
+          } @else {
+            <div class="flex space-x-4">
+              <p><strong>N:</strong> {{ readings()?.n.toFixed(0) }} mg/kg</p>
+              <p><strong>P:</strong> {{ readings()?.p.toFixed(0) }} mg/kg</p>
+              <p><strong>K:</strong> {{ readings()?.k.toFixed(0) }} mg/kg</p>
+            </div>
+          }
+        </div>
+        <button (click)="getReadings()" [disabled]="isLoading()" class="bg-[#A47E3B] text-white font-bold py-2 px-6 rounded-full shadow-lg hover:bg-[#8e6b34] transition-colors duration-300 disabled:bg-gray-400">
+          @if(isLoading()){ <span>Reading...</span> } @else { <span>Read Soil NPK</span> }
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Step 2: Diagnosis & Recommendations -->
+  @if (deficiencies().length > 0) {
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+       <h3 class="text-xl font-bold text-[#A47E3B] mb-4 flex items-center">
+        <span class="bg-[#A47E3B] text-white rounded-full h-8 w-8 flex items-center justify-center mr-3 font-bold">2</span>
+        @if (source() === 'crop') {
+          Nutrient Requirements
+        } @else {
+          Diagnosis & Recommendations
+        }
+      </h3>
+        <p class="mb-4 text-gray-700">
+          @if (source() === 'crop') {
+            Based on general agricultural data, the selected crop has the following nutrient requirements:
+          } @else {
+            The analysis shows the following deficiencies:
+          }
+        </p>
+        <ul class="space-y-3">
+          @for (def of deficiencies(); track def.nutrient) {
+            <li class="flex items-start bg-[#F1EADF] p-3 rounded-lg">
+              <span class="text-2xl mr-3">
+                @if(def.nutrient === 'N'){ 🌿 }
+                @if(def.nutrient === 'P'){ 🌸 }
+                @if(def.nutrient === 'K'){ 🍓 }
+              </span>
+              <div>
+                <p class="font-bold text-[#6A5A4F]">{{ def.level }} in {{ def.nutrient === 'N' ? 'Nitrogen' : def.nutrient === 'P' ? 'Phosphorus' : 'Potassium' }} ({{def.nutrient}})</p>
+                <p class="text-gray-600">Recommended Additive: <span class="font-semibold">{{ getAdditive(def.nutrient) }}</span></p>
+              </div>
+            </li>
+          }
+        </ul>
+    </div>
+  } @else if (readings() || source()) {
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <h3 class="text-xl font-bold text-[#A47E3B] mb-4 flex items-center">
+        <span class="bg-[#A47E3B] text-white rounded-full h-8 w-8 flex items-center justify-center mr-3 font-bold">2</span>
+        Diagnosis & Recommendations
+      </h3>
+       <p class="text-gray-700 font-semibold">Congratulations! Your plant or soil appears to have a good balance of NPK nutrients. No special additives are required.</p>
+    </div>
+  }
+
+
+  <!-- Step 3: Calculate Recipe -->
+  @if (deficiencies().length > 0) {
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+       <h3 class="text-xl font-bold text-[#A47E3B] mb-4 flex items-center">
+        <span class="bg-[#A47E3B] text-white rounded-full h-8 w-8 flex items-center justify-center mr-3 font-bold">3</span>
+        Calculate Your Recipe
+      </h3>
+      <div class="md:flex md:items-center md:gap-4 mb-6">
+        <label for="quantity" class="font-semibold text-gray-700 mb-2 md:mb-0">I want to make:</label>
+        <input 
+          type="number" 
+          id="quantity" 
+          name="quantity"
+          [(ngModel)]="quantity"
+          class="w-24 p-2 border-2 border-[#DCD0C0] rounded-lg focus:ring-2 focus:ring-[#A47E3B]">
+        <select name="unit" [(ngModel)]="unit" class="p-2 border-2 border-[#DCD0C0] rounded-lg bg-white focus:ring-2 focus:ring-[#A47E3B]">
+          <option value="kg">Kilograms (kg)</option>
+          <option value="L">Liters (L)</option>
+        </select>
+      </div>
+
+      @if (recipe(); as currentRecipe) {
+        <h4 class="text-lg font-bold text-[#6A5A4F] mb-3">Your {{quantity()}}{{unit()}} Recipe:</h4>
+        <div class="divide-y divide-[#E5D3B3]">
+          @for (item of currentRecipe; track item.name) {
+            <div class="flex justify-between py-3">
+              <span class="text-gray-700">{{item.name}}</span>
+              <span class="font-bold text-[#4F4A45]">{{ item.amount.toFixed(2) }} {{unit()}}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

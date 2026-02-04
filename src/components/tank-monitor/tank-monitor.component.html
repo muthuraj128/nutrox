@@ -1,0 +1,104 @@
+<div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+  <div class="text-center mb-8">
+    <h2 class="text-3xl font-bold text-[#6A5A4F]">Fertilizer Tank Monitor</h2>
+    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Monitor the conditions inside your organic fertilizer tank to ensure optimal decomposition and safety.</p>
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 text-center mb-8">
+    <!-- Temperature -->
+    <div class="bg-[#F1EADF] p-6 rounded-xl shadow-sm">
+      <h3 class="text-lg font-bold text-[#A47E3B]">Temperature</h3>
+      <p class="text-4xl font-bold text-[#6A5A4F] my-2 min-h-[48px] flex items-center justify-center">
+         @if (realtimeReadings(); as readings) {
+            <span>{{ readings.temp.toFixed(1) }}</span>
+         } @else {
+            <span [class]="connectionStatus() === 'connected' ? 'animate-pulse' : ''">--</span>
+         }
+      </p>
+      <p class="text-sm text-gray-500">°C</p>
+    </div>
+    <!-- Humidity -->
+    <div class="bg-[#F1EADF] p-6 rounded-xl shadow-sm">
+      <h3 class="text-lg font-bold text-[#A47E3B]">Humidity</h3>
+      <p class="text-4xl font-bold text-[#6A5A4F] my-2 min-h-[48px] flex items-center justify-center">
+         @if (realtimeReadings(); as readings) {
+            <span>{{ readings.humidity.toFixed(1) }}</span>
+         } @else {
+            <span [class]="connectionStatus() === 'connected' ? 'animate-pulse' : ''">--</span>
+         }
+      </p>
+      <p class="text-sm text-gray-500">%</p>
+    </div>
+     <!-- Moisture -->
+    <div class="bg-[#F1EADF] p-6 rounded-xl shadow-sm">
+      <h3 class="text-lg font-bold text-[#A47E3B]">Moisture</h3>
+      <p class="text-4xl font-bold text-[#6A5A4F] my-2 min-h-[48px] flex items-center justify-center">
+         @if (realtimeReadings(); as readings) {
+            <span>{{ readings.moisture.toFixed(1) }}</span>
+         } @else {
+            <span [class]="connectionStatus() === 'connected' ? 'animate-pulse' : ''">--</span>
+         }
+      </p>
+      <p class="text-sm text-gray-500">%</p>
+    </div>
+    <!-- pH Level -->
+    <div class="bg-[#F1EADF] p-6 rounded-xl shadow-sm">
+      <h3 class="text-lg font-bold text-[#A47E3B]">pH Level</h3>
+      <p class="text-4xl font-bold text-[#6A5A4F] my-2 min-h-[48px] flex items-center justify-center">
+         @if (phReading(); as ph) {
+            <span>{{ ph.ph.toFixed(1) }}</span>
+         } @else {
+            <span [class]="connectionStatus() === 'connected' ? 'animate-pulse' : ''">--</span>
+         }
+      </p>
+      <p class="text-sm text-gray-500">Acidity/Alkalinity</p>
+    </div>
+    <!-- Methane -->
+    <div class="bg-[#F1EADF] p-6 rounded-xl shadow-sm">
+      <h3 class="text-lg font-bold text-[#A47E3B]">Methane Gas</h3>
+      <p class="text-4xl font-bold text-[#6A5A4F] my-2 min-h-[48px] flex items-center justify-center">
+        @if (realtimeReadings(); as readings) {
+            <span>{{ readings.methane.toFixed(0) }}</span>
+         } @else {
+            <span [class]="connectionStatus() === 'connected' ? 'animate-pulse' : ''">--</span>
+         }
+      </p>
+      <p class="text-sm text-gray-500">Raw Value</p>
+    </div>
+  </div>
+
+  <div class="text-center">
+    @if (connectionStatus() === 'disconnected' || connectionStatus() === 'error') {
+      <button 
+        (click)="connect()"
+        class="bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-700 transition-colors duration-300 flex items-center justify-center mx-auto">
+        Connect to Arduino
+      </button>
+    } @else if (connectionStatus() === 'connected') {
+      <button 
+        (click)="disconnect()"
+        class="bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-red-700 transition-colors duration-300 flex items-center justify-center mx-auto">
+        Disconnect
+      </button>
+    } @else if (connectionStatus() === 'connecting') {
+      <button 
+        disabled
+        class="bg-gray-400 text-white font-bold py-3 px-8 rounded-full shadow-lg cursor-not-allowed flex items-center justify-center mx-auto">
+         <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Connecting...</span>
+      </button>
+    }
+
+    @if (connectionStatus() === 'error') {
+      <div class="mt-4 p-3 bg-red-100 border-l-4 border-red-500 text-red-800 rounded-md max-w-lg mx-auto text-left" role="alert">
+        <p class="font-bold">Connection Failed</p>
+        <p class="text-sm">{{ statusMessage() }}</p>
+      </div>
+    } @else {
+      <p class="mt-4 text-gray-500 min-h-[40px] px-4">{{ statusMessage() }}</p>
+    }
+  </div>
+</div>
