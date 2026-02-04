@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GoogleGenAI, Type } from "@google/genai";
 
-export const GEMINI_API_KEY = new InjectionToken<string>('GEMINI_API_KEY');
-
 export interface AnalysisResult {
   overallHealth: {
     status: string;
@@ -30,7 +28,6 @@ export class GeminiService {
   private ai: GoogleGenAI | null = null;
 
   constructor() {
-    // Check for API key from window (set in index.html or injected by hosting)
     const apiKey = (typeof window !== 'undefined' && (window as any).GEMINI_API_KEY) || '';
     
     if (apiKey && apiKey !== 'YOUR_GEMINI_API_KEY_HERE') {
@@ -40,7 +37,7 @@ export class GeminiService {
 
   async analyzePlantImage(imageBase64: string): Promise<AnalysisResult> {
     if (!this.ai) {
-      throw new Error('Gemini API key is not configured. Please contact the administrator.');
+      throw new Error('Gemini API key is not configured. Please set your API key.');
     }
 
     const prompt = `You are an expert agronomist specializing in South Indian agriculture. Analyze the provided image of a plant leaf/plant. Identify diseases, pest attacks, and nutrient deficiencies. Provide a detailed diagnosis and actionable, step-by-step recommendations for treatment and prevention. Focus on solutions relevant to the South Indian context. Structure your response according to the provided JSON schema. If the image is not a plant or the quality is too poor to analyze, indicate that in the overallHealth summary.`;
