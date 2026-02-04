@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { GoogleGenAI, Type } from "@google/genai";
 
 export interface AnalysisResult {
   overallHealth: {
@@ -25,97 +24,32 @@ export interface AnalysisResult {
 
 @Injectable({ providedIn: 'root' })
 export class GeminiService {
-  private ai: GoogleGenAI | null = null;
+  // API endpoint - uses relative path for Vercel serverless function
+  private apiEndpoint = '/api/analyze-plant';
 
-  constructor() {
-    const apiKey = (typeof window !== 'undefined' && (window as any).GEMINI_API_KEY) || '';
-    
-    if (apiKey && apiKey !== 'YOUR_GEMINI_API_KEY_HERE') {
-      this.ai = new GoogleGenAI({ apiKey });
-    }
-  }
+  constructor() {}
 
   async analyzePlantImage(imageBase64: string): Promise<AnalysisResult> {
-    if (!this.ai) {
-      throw new Error('Gemini API key is not configured. Please set your API key.');
-    }
-
-    const prompt = `You are an expert agronomist specializing in South Indian agriculture. Analyze the provided image of a plant leaf/plant. Identify diseases, pest attacks, and nutrient deficiencies. Provide a detailed diagnosis and actionable, step-by-step recommendations for treatment and prevention. Focus on solutions relevant to the South Indian context. Structure your response according to the provided JSON schema. If the image is not a plant or the quality is too poor to analyze, indicate that in the overallHealth summary.`;
-
-    const imagePart = {
-      inlineData: {
-        mimeType: 'image/jpeg',
-        data: imageBase64,
-      },
-    };
-
-    const textPart = { text: prompt };
-
     try {
-      const response = await this.ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: { parts: [textPart, imagePart] },
-        config: {
-          responseMimeType: 'application/json',
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              overallHealth: {
-                type: Type.OBJECT,
-                properties: {
-                  status: { type: Type.STRING, description: "A one-word health status (e.g., 'Healthy', 'Diseased', 'Stressed')." },
-                  summary: { type: Type.STRING, description: "A concise, one or two-sentence summary of the plant's condition." },
-                },
-              },
-              detectedIssues: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    name: { type: Type.STRING, description: "The common name of the disease, pest, or stressor." },
-                    type: { type: Type.STRING, description: "The type of issue: 'Disease', 'Pest', or 'Stress'." },
-                    description: { type: Type.STRING, description: "A brief explanation of the issue and its symptoms." },
-                  },
-                },
-              },
-              nutrientDeficiencies: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    nutrient: { type: Type.STRING, description: "The name of the deficient nutrient (e.g., 'Nitrogen', 'Iron')." },
-                    symptoms: { type: Type.STRING, description: "The visible symptoms indicating this deficiency." },
-                  },
-                },
-              },
-              treatmentRecommendations: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    title: { type: Type.STRING, description: "A descriptive title for the treatment plan." },
-                    steps: { type: Type.ARRAY, items: { type: Type.STRING }, description: "A list of actionable steps for the treatment." },
-                    type: { type: Type.STRING, description: "The category of treatment: 'Organic', 'Chemical', or 'Cultural'." },
-                  },
-                },
-              },
-              preventiveMeasures: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
-                description: "A list of general preventive measures to avoid future issues."
-              }
-            },
-          },
+      const response = await fetch(this.apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ imageBase64 }),
       });
 
-      let jsonStr = response.text.trim();
-      const parsedResult: AnalysisResult = JSON.parse(jsonStr);
-      return parsedResult;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to analyze the image');
+      }
+
+      const result: AnalysisResult = await response.json();
+      return result;
 
     } catch (error) {
-      console.error('Error calling Gemini API:', error);
-      throw new Error('Failed to analyze the image. The AI model may be temporarily unavailable.');
+      console.error('Error calling analysis API:', error);
+      throw new Error('Failed to analyze the image. The service may be temporarily unavailable.');
     }
   }
 }
